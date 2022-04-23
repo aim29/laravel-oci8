@@ -195,6 +195,15 @@ class OracleGrammar extends Grammar
             return $value;
         }
 
+        $segments  = explode('@', $value);
+        if (count($segments) > 1) {
+            $subsegments = explode('.', $value);
+            $value = $segments[0];
+            if (count($subsegments) > 1) {
+                $value .= '.'.$subsegments[1];
+            }
+        }
+
         return parent::wrap($value, $prefixAlias);
     }
 
@@ -220,7 +229,14 @@ class OracleGrammar extends Grammar
             $tableName = $this->wrap($this->tablePrefix . $segments[0]) . ' ' . $segments[1];
         }
 
-        return $this->getSchemaPrefix() . $tableName;
+        $dbLink = '';
+        $segments  = explode('@', $table);
+        if (count($segments) > 1) {
+            $tableName  = $this->wrap($segments[0]);
+            $dbLink = '@'.$segments[1];
+        }
+
+        return $this->getSchemaPrefix() . $tableName . $dbLink;
     }
 
     /**
